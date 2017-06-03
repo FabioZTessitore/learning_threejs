@@ -5,22 +5,23 @@
   const webglContainer = document.getElementById('webgl-container');
 
   const scene = new THREE.Scene();
-  let camera;
-  let camera_x = 0;
-  let x = 0;
+  let camera = new THREE.PerspectiveCamera(45, WIN_WIDTH / WIN_HEIGHT, 0.1, 1000);
+  camera.position.z = 4;
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setClearColor(0x333333);
   renderer.setSize(WIN_WIDTH, WIN_HEIGHT);
 
+  let trackballControls = new THREE.TrackballControls(camera);
+  trackballControls.rotateSpeed = 1;
+  trackballControls.zoomSpeed = 1;
+  trackballControls.panSpeed = 1;
+
+  webglContainer.appendChild(renderer.domElement);
+
   var loader = new THREE.ColladaLoader();
   loader.load('stanza.dae',
     function ( collada ) {
-      console.log(collada.scene);
-
-      camera = collada.scene.children[0].children[0];
-      camera_x = camera.position.x;
-
       scene.add( collada.scene );
       render();
     },
@@ -29,13 +30,12 @@
     }
   );
 
-  webglContainer.appendChild(renderer.domElement);
-
+  var clock = new THREE.Clock();
   const render = function () {
-    requestAnimationFrame( render );
+    var delta = clock.getDelta();
+    trackballControls.update(delta);
 
-    x += 0.01;
-    camera.position.x = camera_x + Math.sin(x);
+    requestAnimationFrame( render );
 
     renderer.render(scene, camera);
   };
