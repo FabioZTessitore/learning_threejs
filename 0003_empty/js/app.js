@@ -48,6 +48,7 @@ let go = false;
       //console.log(t);
       empty.position.y = 3*Math.sin(t);
       empty.position.x = 3*Math.cos(t);
+      empty.position.z += 0.005 * Math.sin(10*t);
     }
 
     renderer.render(scene, camera);
