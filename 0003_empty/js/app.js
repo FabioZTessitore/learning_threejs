@@ -7,11 +7,12 @@ let go = false;
   const webglContainer = document.getElementById('webgl-container');
 
   const scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(45, WIN_WIDTH / WIN_HEIGHT, 0.1, 1000);
-  camera.position.z = 4;
+  let camera = new THREE.PerspectiveCamera(55, WIN_WIDTH / WIN_HEIGHT, 0.1, 1000);
+  camera.position.z = 1.6;
 
   let empty = new THREE.Object3D();
-  empty.position.set(0, 0, 10);
+  empty.position.set(0, 0, 1.6);
+  empty.rotation.x = 1.5;
   scene.add(empty);
 
   empty.add(camera);
@@ -36,12 +37,14 @@ let go = false;
     }
   );
 
-  let clock = new THREE.Clock();
+  //let clock = new THREE.Clock();
+  let t = 0;
   const render = function () {
     requestAnimationFrame( render );
 
     if (go) {
-      var t = clock.getElapsedTime();
+      //var t = clock.getElapsedTime();
+      t += 0.01;
       //console.log(t);
       empty.position.y = 3*Math.sin(t);
       empty.position.x = 3*Math.cos(t);
