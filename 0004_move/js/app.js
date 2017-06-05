@@ -1,9 +1,9 @@
-let empty;
+let go_f = false;
+let go_b = false;
+let go_l = false;
+let go_r = false;
 
-let go_w = false;
-let go_s = false;
-let go_a = false;
-let go_d = false;
+let controls;
 
 (function () {
   const WIN_WIDTH = window.innerWidth;
@@ -12,15 +12,14 @@ let go_d = false;
   const webglContainer = document.getElementById('webgl-container');
 
   const scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(55, WIN_WIDTH / WIN_HEIGHT, 0.1, 1000);
-  camera.position.z = 1.6;
 
-  empty = new THREE.Object3D();
-  empty.position.set(0, 0, 1.6);
-  empty.rotation.x = 1.5;
-  scene.add(empty);
+  let camera = new THREE.PerspectiveCamera(45, WIN_WIDTH / WIN_HEIGHT, 0.1, 1000);
 
-  empty.add(camera);
+  controls = new THREE.PointerLockControls(camera);
+  scene.add(controls.getObject());
+  controls.getObject().position.z = 2;
+  controls.getObject().position.y = 0;
+  controls.getObject().rotation.x = Math.PI/2.;
 
   const renderer = new THREE.WebGLRenderer();
   renderer.setClearColor(0x333333);
@@ -43,45 +42,70 @@ let go_d = false;
     }
   );
 
+  document.addEventListener('pointerlockchange', function (event) {
+    //console.log(event);
+    if (document.pointerLockElement!==null) {
+      controls.enabled = true;
+    } else {
+      controls.enabled = false;
+    }
+  }, false);
+
+  document.addEventListener('click', function () {
+    document.body.requestPointerLock();
+  });
+
   //let clock = new THREE.Clock();
   let t = 0;
+
+  let vel_x = 0, vel_y = 0, vel_z = 0;
 
   const render = function () {
     requestAnimationFrame( render );
 
-    animate();
+    vel_x -= vel_x * 0.2;
+    vel_y -= vel_y * 0.2;
+
+    if (go_f) vel_y -= 0.005;
+    if (go_b) vel_y += 0.005;
+    if (go_l) vel_x -= 0.005;
+    if (go_r) vel_x += 0.005;
+
+    controls.getObject().translateX( vel_x );
+    controls.getObject().translateY( vel_z );
+    controls.getObject().translateZ( vel_y );
 
     renderer.render(scene, camera);
   };
 })();
 
-function animate() {
-  if (!go_w || !go_s || !go_a || !go_d) return;
-
-  t += 0.01;
-  empty.position.z += 0.005 * Math.sin(10*t);
-}
-
 function keydown_handler(e) {
   if (e.key == 'w') {
-    empty.position.y += 0.05;
-    go_w = true;
+    go_f = true;
   }
   if (e.key == 's') {
-    empty.position.y -= 0.05;
-    go_s = true;
+    go_b = true;
   }
   if (e.key == 'a') {
-    empty.position.x -= 0.05;
-    go_a = true;
+    go_l = true;
   }
   if (e.key == 'd') {
-    empty.position.x += 0.05;
-    go_d = true;
+    go_r = true;
   }
 }
 
 function keyup_handler(e) {
   //console.log(e);
-  //if (e.key == 's') empty.position.z = 0;
+  if (e.key == 'w') {
+    go_f = false;
+  }
+  if (e.key == 's') {
+    go_b = false;
+  }
+  if (e.key == 'a') {
+    go_l = false;
+  }
+  if (e.key == 'd') {
+    go_r = false;
+  }
 }
